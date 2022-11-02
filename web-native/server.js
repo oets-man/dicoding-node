@@ -8,7 +8,10 @@ const http = require("http");
  */
 const requestListener = (request, response) => {
 	const { method, url } = request;
-	response.setHeader("Content-Type", "text/html");
+	// response.setHeader("Content-Type", "text/html");
+	response.setHeader("Content-Type", "application/json");
+	response.setHeader("X-Powered-By", "NodeJS");
+
 	response.statusCode = 200;
 	if (method == "GET" && url === "/") {
 		response.end(`<h1>Halo HTTP ${method}</h1>`);
@@ -26,6 +29,20 @@ const requestListener = (request, response) => {
 			response.end(`<h1>Hai, ${name}!</h1>`);
 		});
 	}
+
+	//else all
+	response.statusCode = 404;
+	// response.write("<html>");
+	// response.write("<body>");
+	// response.write("<h1>Halaman tidak ditemukan!</h1>");
+	// response.write("</body>");
+	// response.write("</html>");
+	// response.end();
+	response.end(
+		JSON.stringify({
+			message: "Halaman tidak ditemukan!",
+		})
+	);
 };
 
 const server = http.createServer(requestListener);
