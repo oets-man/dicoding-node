@@ -1,4 +1,5 @@
 const handler = require('./handler');
+
 const routes = [
 	{
 		method: 'POST',

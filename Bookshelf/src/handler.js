@@ -1,4 +1,5 @@
 const { nanoid } = require('nanoid');
+const _ = require('lodash');
 const books = require('./books');
 
 const addBook = (request, h) => {
@@ -13,7 +14,7 @@ const addBook = (request, h) => {
 		reading,
 	} = request.payload;
 	const id = nanoid(16);
-	const finished = pageCount === readPage ? true : false;
+	const finished = pageCount === readPage;
 	const insertedAt = new Date().toISOString();
 	const updatedAt = insertedAt;
 	const newBook = {
@@ -31,7 +32,7 @@ const addBook = (request, h) => {
 		updatedAt,
 	};
 
-	if (typeof name == 'undefined') {
+	if (typeof name === 'undefined') {
 		const response = h.response({
 			status: 'fail',
 			message: 'Gagal menambahkan buku. Mohon isi nama buku',
@@ -72,21 +73,39 @@ const addBook = (request, h) => {
 };
 
 const getAllBooks = (request, h) => {
-	const ret = request.query == '[Object: null prototype] {}' ? true : false;
-	console.log(ret);
+	const isQuery = !_.isEmpty(request.query);
+
+	// tanpa query paramater
+	if (!isQuery) {
+		const response = h.response({
+			status: 'success',
+			data: {
+				books: books.map((book) => {
+					const container = {};
+					container.id = book.id;
+					container.name = book.name;
+					container.publisher = book.publisher;
+					return container;
+				}),
+			},
+		});
+		return response;
+	}
+
+	// query = reading
 	let { reading } = request.query;
 	if (typeof reading !== 'undefined') {
-		reading = reading == 1 ? true : false;
+		reading = reading === '1';
 		const response = h.response({
 			status: 'success',
 			data: {
 				books: books
 					.filter((book) => book.reading === reading)
-					.map((item) => {
+					.map((book) => {
 						const container = {};
-						container.id = item.id;
-						container.name = item.name;
-						container.publisher = item.publisher;
+						container.id = book.id;
+						container.name = book.name;
+						container.publisher = book.publisher;
 						return container;
 					}),
 			},
@@ -94,19 +113,20 @@ const getAllBooks = (request, h) => {
 		return response;
 	}
 
+	// query = finished
 	let { finished } = request.query;
 	if (typeof finished !== 'undefined') {
-		finished = finished == 1 ? true : false;
+		finished = finished === '1';
 		const response = h.response({
 			status: 'success',
 			data: {
 				books: books
 					.filter((book) => book.finished === finished)
-					.map((item) => {
+					.map((book) => {
 						const container = {};
-						container.id = item.id;
-						container.name = item.name;
-						container.publisher = item.publisher;
+						container.id = book.id;
+						container.name = book.name;
+						container.publisher = book.publisher;
 						return container;
 					}),
 			},
@@ -114,19 +134,33 @@ const getAllBooks = (request, h) => {
 		return response;
 	}
 
-	const response = h.response({
-		status: 'success',
-		data: {
-			books: books.map((item) => {
-				const container = {};
-				container.id = item.id;
-				container.name = item.name;
-				container.publisher = item.publisher;
-				return container;
-			}),
-		},
-	});
-	return response;
+	// query = name
+	const { name } = request.query;
+	if (typeof name !== 'undefined') {
+		const response = h.response({
+			status: 'success',
+			data: {
+				books: books
+					.filter((v) => v.name.toLowerCase().indexOf(name.toLowerCase()) >= 0)
+					.map((book) => {
+						const container = {};
+						container.id = book.id;
+						container.name = book.name;
+						container.publisher = book.publisher;
+						return container;
+					}),
+			},
+		});
+		return response;
+	}
+
+	// query tidak dikenal
+	return h
+		.response({
+			status: 'fail',
+			message: 'Query parameter tidak dikenal!',
+		})
+		.code(404);
 };
 
 const getBookById = (request, h) => {
@@ -162,7 +196,7 @@ const editBookById = (request, h) => {
 		reading,
 	} = request.payload;
 
-	if (typeof name == 'undefined') {
+	if (typeof name === 'undefined') {
 		const response = h.response({
 			status: 'fail',
 			message: 'Gagal memperbarui buku. Mohon isi nama buku',
