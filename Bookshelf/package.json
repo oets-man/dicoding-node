@@ -16,14 +16,5 @@
   "dependencies": {
     "@hapi/hapi": "^20.2.2",
     "nanoid": "^3.3.4"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/oets-man/notes-app.git"
-  },
-  "bugs": {
-    "url": "https://github.com/oets-man/notes-app/issues"
-  },
-  "homepage": "https://github.com/oets-man/notes-app#readme",
-  "description": ""
+  }
 }
