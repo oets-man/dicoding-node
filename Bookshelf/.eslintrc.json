@@ -5,8 +5,7 @@
         "node": true
     },
     "extends": "airbnb-base",
-    "overrides": [
-    ],
+    "overrides": [],
     "parserOptions": {
         "ecmaVersion": "latest"
     },
@@ -23,6 +22,12 @@
             "error",
             "always"
         ],
-        "no-tabs": 0
+        "no-tabs": 0,
+        "max-len": [
+            "error",
+            {
+                "code": 120
+            }
+        ]
     }
 }
